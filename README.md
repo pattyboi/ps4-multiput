@@ -150,6 +150,13 @@ the best value for your network. The accepted range is 1–64.
   means every announced byte range was written without a reported I/O error.
 - The receiver lives inside `ScePartyDaemon`; it stops when that process or the
   console restarts. Run the injector again after a restart.
+- GoldHEN does not stop a previously injected payload before starting a new
+  one. Re-running the injector without a console restart starts a second
+  listener thread that fails to bind the already-open port and exits
+  silently — the **old** listener keeps answering. If you changed
+  `multiput.c` and re-injected but behavior didn't change, restart the
+  console (or pick a fresh `DEFAULT_PORT` for the rebuild) before concluding
+  the new build is broken.
 
 ## Offline verification
 
