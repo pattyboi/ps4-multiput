@@ -58,9 +58,12 @@ instructions.
 
 ## Requirements
 
-Host:
+To run the prebuilt release on the host:
 
 - Python 3.10 or newer; standard library only
+
+To rebuild `multiput.elf`:
+
 - POSIX `make`
 - the PS4 payload SDK binary distribution
 
@@ -69,6 +72,9 @@ Console:
 - a jailbroken PS4 running GoldHEN
 - GoldHEN PayLoader enabled, normally TCP 9090
 - network access from the host to the console
+
+The release tarball includes a prebuilt `multiput.elf`; the SDK is not needed
+unless you rebuild it or select a different listener port.
 
 Install the SDK using its published binary distribution:
 
