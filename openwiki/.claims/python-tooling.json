@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:b84265ed436203bbec61a3d15765a449c2826a99ab306d9596afc1720a981588",
+  "claims": [
+    {
+      "id": "claim_fe0738ca91384e6a88acadfb047570ed",
+      "statement": "load_payload() validates ELF magic, 64-bit little-endian class, and e_machine==62 (x86-64) before any network call; launch_goldhen() POSTs the raw ELF to GoldHEN PayLoader over HTTP and requires a 200 status line.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_inject.py#L21-L51",
+          "version": "repo-lines-v1:sha256:8aedeef46c36f6be48181c938bf435b0060ad34ae93cc7e1997e1c26c35aea1f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1NGRhYTEyOTFhOGQ0ZjIwMGFlNGE2ZjBlYjI1NTQ0MmZiOTVjY2VjYWI4ZWEyYmVmYzQzN2NmNjNlNGFlZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmMWVmMmE3Y2VkMThhZjk3NWYzNzlhOTQ0OTMzNjhiMTMxZDJkNzMwODhhYjIwYjhkMjQ4MmE5YjEzY2VlNWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhODc4YTI2YWQ4M2Y0MzM1MzU1MWI3MmFjZjk2MmM0NWI1YmE1MDA5NTAwMDNmNGM3ZTFkMmZlMjk5NzUwNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYWYxYWU5NDM0YmFkODY2YTA5OTcxNmI0YjM5ODQ0YmI3YTcwOTc4YTAzYWJkY2YwZjFlYTZjYzFjYWM1MTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5d36ffe581df4f889cfc2eb72de2b2a9",
+      "statement": "wait_for_listener() sends a probe header with kind=0xFF and an already-allowed path (/data/pkg/.multiput-probe), relying on the receiver's conn_step() falling through to its error branch for an unrecognized kind, so the probe proves protocol-level reachability without creating or touching a file.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_inject.py#L54-L69",
+          "version": "repo-lines-v1:sha256:3bf70978d08318318b4236d3b02b672684c12122ea38a95281bb9b6127bd1760:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjMmI2ZjRiNDg0NzZlNTY3NTc3YjEwYzU0MzI4MWYwMDkyNDkyMGMxNjc1ZjU4OWI2MzE1N2VlODcxZTk0MzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZTA2M2VmMTI3ZmZmODdiZjE5NzNiMDBjODkxZWE1MmI1OTFmNDVhMjg0OTI4NTZkNDAwNjM0YzZmYTVkODYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzOWM1MjZiZDQ1YjRmZmQzMGQ2ZTNlYzdiZWFkMGYwNDI2MDM0OWUzNGFjYjdlNDRlNzViYzM3YzQ5ZGZkN2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiNmQ5YzZjMDU0OTBkZGMwZTBiNjdmNTZmZGEyYTUxMGFlMGI2Yzg1ZjAyZTA3MmE2YzhjZTVjNjE0YWY5ZjgifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L453-L464",
+          "version": "repo-lines-v1:sha256:ac76d5e9be2df2a6f13758987412de09903fd8cdb777fe27d1db35bbe4295076:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjgzNzIyNDVlMzQ2OTljNTQ3MGNjZDJlYWM4ZmI4MTI0MDMwYzQyYzYwNmNjNzA0NTczM2ZhNzUwNTNjNmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5ZmQyYzEwOGE3NzZiNmE1ZmMyMjkyNzMzMzQ1YWM4NGIxMzFiYzk1MDcyMTU5ZjRkYjIwZWNiODkxYWMxNDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjNjRjOWU5M2ZhNzFjZWNiZTY2NzM1OTNiM2U4ZDQ3M2NmYzM2Y2JkZmQxMGRiZmE5NDYxYWM4MDliMWJlZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmMmY2MzYxZjdlMWFlY2RkNmNmZTExYzBiZDM1ZTU0Nzk2NjI2MGU3YWFmMDc1NWNhZDk5ODY3NTM2ZDM2NjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_81803d5acdde4c56a1a458addca3ee58",
+      "statement": "push_multistream() requires a SETUP acknowledgement before opening any DATA connection, splits the file into streams (1-64) contiguous ranges where every range but the last uses total//streams and the last absorbs the remainder via total-offset, and returns True only if every per-thread DATA connection is acknowledged.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_push.py#L78-L149",
+          "version": "repo-lines-v1:sha256:48c9697006bc47c71347a95c9cd549a88f27450bcb27b3c28e20508b4c3972ce:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwM2VkYjE3YmEzZGRlNzZmN2M3Nzg1ZTg4ODE2ZWQzODY0NWRkYzVkYTY5YTk2YWNlZGUxNTc3OTEzYmU1NTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1YzdjYTMxMWYzZWJhNWJhODU5MjU5OTI1N2M2Nzg4MzdhMGJjM2EzMWVjMTE1ODY5ZDJmODE4ODNhMGYwMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiNjU3NGI4ZjU2ZjNlNGQ2MWI3Y2FkNWZmYjFjNTc3NmNhZmYxOTIwY2Q4MDBlMDIyZGZjMWRhOWZiNGY2ZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5YTc3NzU5NDE2OGI3NDlhZDM5OThlMGM3NGFmOTEzZmQ5MTcwZmUyMzAxZWMyZGE4NGUwMGQxYmRmZDA4YjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_52d9e6c294e24845a767a4a47cdd4049",
+      "statement": "_send_range() opens one dedicated DATA connection per stream, sends the range's starting offset as the header arg, streams the local file in 1 MiB chunks, and requires a K acknowledgement specific to that connection before returning.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_push.py#L52-L76",
+          "version": "repo-lines-v1:sha256:eb79c2e179f3c08d2fce36cf96e7464cfbcf3cf45901d1b5830bdc51c34b7e3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhMDIxNzIzNmQ1ZWZkODRmYzhlMTY0YmVjNGUxY2I2NTU4ZGIzY2Y0NWM4YWU5ZDc2YzczZjc1YTQ1YTUxNjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2MmNlZGIzYzYzODA2MTY4N2YxNWJlYjJhZGQxNmY2NTM1YzVkNzVjZTg4YjQ5MzlhYzdkM2ZiZDQxOWMxOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjZTU2YTBmMDkyOTQ3N2E2NGRmNGE2YTc1M2MzMjk1ZDQyMDMyMDdkNmZjNDliZTZhNmU0NWRlYzM4ZTA1ZWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_58ca6ec69e72469e9083e890ab3e12c6",
+      "statement": "multiput_protocol.py's validate_remote_path() is reused unmodified by both multiput_push.py's real transfers and its own offline _TestServer selftest, making it the single client-side enforcement point for the /data/pkg/ destination boundary.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_protocol.py#L23-L34",
+          "version": "repo-lines-v1:sha256:3e1180a69195674eff9d7df3f82247af0b7eea774f8dc11d0b3ead5b7caa7a51:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZDdhMTllNmEwYjliNWI0N2YyMGUzOTBlYmQ3YTU4OGVkYzk4OTg3OGFjMzFkYjczYzc3MDVmMGI3MmU0ZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NDJjNGUxMDRhMmYxZGQ0YmI4MmE1Nzk5NTRlMTIwYjFjOTEzY2IzOTljMDE4OTljZjhhMzVhN2UyNmQ2ZjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkYjMxZjUxZjc2ODhlNGVlYWI5ZDJhM2QzNTY1YmFiOTU0MjY0MjM1M2Q4MTkyZTk5MjIxNzgxN2JkMGE0ZjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwOWMxZDkyNjI3NGQzZmNiMzQwZTg1ZWEzMjVlNTQ2MWU1ZThjMmViNDJiMmJmNDQ3NzMyNWNjMzFhZWU2MzEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T19:28:00.481Z"
+  }
+}

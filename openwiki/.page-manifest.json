@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/build-and-release.md": {
+      "pageVersion": "sha256:a8442c9359a2ff31335a0d7869b744fba614b515c2f5db351626e5c9666a5985",
+      "completedBy": "omp",
+      "completedRunId": "57a1a342-74dd-40f6-b3a0-e9e3b939d7f9",
+      "gitHead": "583bd4a21c8c4c13d4416b178c4deb86cde56240",
+      "sourceFingerprint": "sha256:6282b6ce3a3d157d0835a2a14d9d258926203dcd6938038cd5fed28a44449328"
+    },
+    "/openwiki/overview.md": {
+      "pageVersion": "sha256:885d4623ffd79ec062d985fcb28bcb96ed5b656ffa09238de65588c617954fba",
+      "completedBy": "omp",
+      "completedRunId": "57a1a342-74dd-40f6-b3a0-e9e3b939d7f9",
+      "gitHead": "583bd4a21c8c4c13d4416b178c4deb86cde56240",
+      "sourceFingerprint": "sha256:6282b6ce3a3d157d0835a2a14d9d258926203dcd6938038cd5fed28a44449328"
+    },
+    "/openwiki/python-tooling.md": {
+      "pageVersion": "sha256:b84265ed436203bbec61a3d15765a449c2826a99ab306d9596afc1720a981588",
+      "completedBy": "omp",
+      "completedRunId": "57a1a342-74dd-40f6-b3a0-e9e3b939d7f9",
+      "gitHead": "583bd4a21c8c4c13d4416b178c4deb86cde56240",
+      "sourceFingerprint": "sha256:6282b6ce3a3d157d0835a2a14d9d258926203dcd6938038cd5fed28a44449328"
+    },
+    "/openwiki/quickstart.md": {
+      "pageVersion": "sha256:d111566a76089086c46a74dd9124f3ab9cbac865eed9e484a8357c0f6297d5ca",
+      "completedBy": "omp",
+      "completedRunId": "57a1a342-74dd-40f6-b3a0-e9e3b939d7f9",
+      "gitHead": "583bd4a21c8c4c13d4416b178c4deb86cde56240",
+      "sourceFingerprint": "sha256:6282b6ce3a3d157d0835a2a14d9d258926203dcd6938038cd5fed28a44449328"
+    },
+    "/openwiki/receiver.md": {
+      "pageVersion": "sha256:017e65df22a68db821a056c4de9ae32b582b4739a2fa14a6698123cfd2d033e3",
+      "completedBy": "omp",
+      "completedRunId": "57a1a342-74dd-40f6-b3a0-e9e3b939d7f9",
+      "gitHead": "583bd4a21c8c4c13d4416b178c4deb86cde56240",
+      "sourceFingerprint": "sha256:6282b6ce3a3d157d0835a2a14d9d258926203dcd6938038cd5fed28a44449328"
+    },
+    "/openwiki/wire-protocol.md": {
+      "pageVersion": "sha256:183d9ba0ca11c76cca93ace7665783a47bc43062f7764e12fd5a5a64ed64863e",
+      "completedBy": "omp",
+      "completedRunId": "57a1a342-74dd-40f6-b3a0-e9e3b939d7f9",
+      "gitHead": "583bd4a21c8c4c13d4416b178c4deb86cde56240",
+      "sourceFingerprint": "sha256:6282b6ce3a3d157d0835a2a14d9d258926203dcd6938038cd5fed28a44449328"
+    }
+  }
+}

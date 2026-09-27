@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:a8442c9359a2ff31335a0d7869b744fba614b515c2f5db351626e5c9666a5985",
+  "claims": [
+    {
+      "id": "claim_614ed749d58446f38b39644dbfb9474f",
+      "statement": "The Makefile requires PS4_PAYLOAD_SDK to be set and includes $(PS4_PAYLOAD_SDK)/toolchain/orbis.mk, failing the build with 'PS4_PAYLOAD_SDK is undefined' otherwise.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L5-L9",
+          "version": "repo-lines-v1:sha256:cd7be1e8a1d237f138defb0db57c6e93be404e18661234e17154630781d40611:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYzMzE5YzNmNDdjMjJmYjg0YmM4ZjZhMWQyYTFlNzRmOGUwOGFjZWY1M2I2Y2Y4Y2I0ZGVhNWM4ZGYxYjkyNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTJkYTlhNWY5OTc0ZmU5NGVjNzg1ZDc1MWVmMGMyZGQ0NjQ0YzZmYTFiM2FmNjI0NjBkNzY0MDFmODFlZjczYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmE4MTFmY2YzZDQ3YmQxYTQzNmIzYTIzOWRlMjI5ZmM5NWZlMzcyZmY2NDNlZDhjNjM0NTg3NWRhOTU0NDVjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTQ2ZjkxMzA4YmFhNzhiYzk5NjY4MDRjZTA2NzY2NTczNjE2ZDhkZDBiYTU1ZTlmNDJlMTU0Nzc0MTBmYWViNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_84081996b9264baab57b9a2164b1d8d3",
+      "statement": "multiput.elf is compiled with -O2 -fPIC -ffreestanding -fno-builtin -fno-stack-protector -fno-asynchronous-unwind-tables -fno-unwind-tables -mstackrealign -Wall -Wextra -Werror plus EXTRA_CFLAGS, then linked with orbis-ld -e _start and no CRT/libc.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L14-L27",
+          "version": "repo-lines-v1:sha256:a6fae976f3bb7a66fc8a6babef57cb81d711797b8c697f444d901d1c78bb1ee5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjNjMwMjU5Mjg5NmY1OTFlOWFhZWQxYWNmNTk4YjdiMmNlNzQxNDBiZjU1YjdmOGMyNTMxYjZhOThkMTM5NGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3Mzc5NDgxZWViYzQyOWI0NjhmNmUyMWY4MDYxNWVkODVjYTQ4ZjI0YmYwYTgwNGVlY2Y4MDJkOTE2MzkzNzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEyM2UwNTlmMWY0MWE5NmQzMGI2NzA2MjU4OWQ4YzIyNGJlYjNlYWE3ZDJkZDQ3ZmY4NTEwMGQxMzRmNjIxZWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxNGQ5ZTUzNGU0ZjQ3MTI5ZTI4MmYzYmQyNzVjNDg3YjI0NmZjMjQ3NGE2NjYyMTM5MTYwMDhhMjY1MTk3YzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3aaadbee4bd04a93ab223a93c2588d3c",
+      "statement": "DEFAULT_PORT defaults to 9022 via #ifndef in multiput.c and is only overridable at compile time, e.g. make EXTRA_CFLAGS=-DDEFAULT_PORT=9027; multiput_inject.py's --listener-port only controls which port the Python client polls, not what the ELF binds.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L14-L16",
+          "version": "repo-lines-v1:sha256:41ecc055eefbd2812e6eee982710e2dfc40384819237a3616f91583923d93918:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGM2MzAyNTkyODk2ZjU5MWU5YWFlZDFhY2Y1OThiN2IyY2U3NDE0MGJmNTViN2Y4YzI1MzFiNmE5OGQxMzk0ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ5YWU5ZTZmZGIyMzQ2YTQ3YTVjOWZkYTVjZTczMmEyZDgwYTA3ODJmMzUxMzI0NzA0YmE1MzNlOWEyZjZhYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTIzZTA1OWYxZjQxYTk2ZDMwYjY3MDYyNTg5ZDhjMjI0YmViM2VhYTdkMmRkNDdmZjg1MTAwZDEzNGY2MjFlYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzc2NjE4ZGJlMmQzMDhjYmI0ZTAxYjE5M2IzZDRlMTlhOGY5YzRhZDgxMmJiOGJkMzI0NWM1ODI4Njg2ZTg2MSJ9"
+        },
+        {
+          "resource": "repo://src/multiput.c#L21-L23",
+          "version": "repo-lines-v1:sha256:e11f652b2d5c90ed9a4563af9e67d7a78f7ed127c68dc991684b0f2b87adeda4:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2JjYjcxZWNjMTc2YzExOTdhMDRkNWNlNGQwYTNiZGU2MjFmZmU5MGM3NzA0MzUyNTZkZmE2YTM3MDJmMjk2YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWEzNDliYmQxYTIxMTA0ZjA1MWUzNGIyYzhhOWU3MGNjN2ZiYjUwYmMxOWE2Nzc4MWYyYTE0MGMzODZkOTQzOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGE1ZGE4ZDBhYWY2NWE1NTFhMmZjMzhhN2FlMTkwMGI5OTYwNzVmNjBlODEyNzdhZTA5NjRjMDdiODBlZTIwNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTEwMTU0YTViNThkYjlhZmNmZTViY2ZiNDI1M2QyZTQzMGJmZWVlZjUyZTBlNGYwMjMwZjMzZmUwMWQ2YjIzYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_11a8cafcf63d4e36b3f8ccdc29253600",
+      "statement": "make check builds the ELF then runs `python3 multiput_inject.py --selftest` and `python3 multiput_push.py --selftest`, both fully offline against loopback sockets with no console or network contact.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L29-L31",
+          "version": "repo-lines-v1:sha256:45a72a409664d4fb7cb57f04ea724a9de9303c483844449d7587c1b49ad150e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTkwYjdlNTc3YTU4NDY2OTA3NGQ1Nzk5Y2VjNTEyMmY0NTNiN2JlZDI4MDAxMDdlNTY3Y2EwZWZmZmVjMjQ2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjMwMDVkNWEyYjVlZDg5NTZiZWZkYWVlZGE4ZTFkZGFlNWY5MmY1MTJhZTY3ODZkYzEwNTE2OTA1NjQ3OGI3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDFhNDk4N2M2ZjgyODU1NmRkY2FmYTdkMGNlYjlmNDQ3OGU4ZTMwM2U5NjI4ZGRiZTA3ODMzZDUwMTVmNzNlNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmJiZWY5MDI5ZjBmYmU4NmVhYTJiYTFjMjM5NWY4NWRjNzA0YzI0N2ZiNWMxMjA4MmU0MWY2NzNhZWRhMzkwYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_450c33977b1144a08c64258da7619e63",
+      "statement": "The release tarball is built with a deterministic tar invocation (--sort=name, fixed --mtime, --owner=0 --group=0 --numeric-owner) bundling .gitignore, CHANGELOG.md, LICENSE, Makefile, README.md, VERSION, the prebuilt multiput.elf, the three Python modules, and src/multiput.c, alongside a SHA256SUMS file verified with sha256sum -c.",
+      "evidence": [
+        {
+          "resource": "repo://CHANGELOG.md",
+          "version": "repo-file-v1:sha256:28ef8513772d1a738cfce5bc92d93b413bb7588bcae5a8127bd50049bb526d57"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T19:28:00.481Z"
+  }
+}

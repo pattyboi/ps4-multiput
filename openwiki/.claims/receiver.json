@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:017e65df22a68db821a056c4de9ae32b582b4739a2fa14a6698123cfd2d033e3",
+  "claims": [
+    {
+      "id": "claim_a7cbe5d7b15649fb87a119864d0a5cc5",
+      "statement": "resolve_syscalls() captures __builtin_return_address(0) at _start, masks it to a 0x4000-byte page, and scans backward up to 32 pages for the byte pattern 48 c7 c0 <syscall number LE32> 49 89 ca 0f 05, recording matches for the twelve required syscall numbers (read=3, write=4, open=5, close=6, accept=30, socket=97, bind=104, setsockopt=105, listen=106, poll=209, pwrite=476, ftruncate=480) into a found bitmask, stopping at bitmask 0x0fff or after 32 pages.",
+      "evidence": [
+        {
+          "resource": "repo://src/multiput.c#L119-L162",
+          "version": "repo-lines-v1:sha256:7da20b8d227e7416764ce83c48c8f2c8050b431ed96417942e79d8900662ad8c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjNGI0MWQ4YTVhZDA0ZmE3Y2QxN2VmMzUxNjU1MWY0ZGNiYjViYmVhMWFmNjcwZmU0NTliYjI3OWZhYjkxNzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE3YmE4NDk4NGNlZDY5NmU5NTUwNjM4Y2ExMzZlOTBkNzM3NWU5NWE4MmZlNTVkMjI0M2UwZjQwNGRmYjY2ZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4ZDVmYTU3YzlkMGJlYzFkOWEzODE2MTk5ODE5YWRhNGY0NWY2YTYwM2NjOWI1YTFjOGEyNmM5NTBkZWQ1OGYifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L573-L579",
+          "version": "repo-lines-v1:sha256:d9ee12a1a57762979a8d9eb1ebb93fc0871c95780c8e84dac0b3711cade4d319:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FjNWVlY2ZkYzZmZDc4ZWI5MzM0MGI2YzNiMWQwOWYxZDMzNmE3NGI1YmZjYTZjZTRmZDAzYTc2NTEzZDNjMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmZkNmNjZTBlZjcxMjE0NWUyYjc5ZTc5NDFiNWVhYzUxZWQ2NmMyYjkyYmYxY2Q2NGM3YmUxOGZiNzBiNmYzYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTc2YjVkOTI3N2FmMGM1MTk0NzhmMjQ2ZGZiMDkxZmYyYTllMzMwNTE3YjYxYTllZTMxM2NlMDZjOWNkZTI0ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTgxNmIyNzc2NTlkZTgzYTliYTVmMjVlOTM3NDMwYWIxYzdmMGJjY2NlOTU4MjBkZWM0MDQwZWYzNmVjMjk1MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_1685351e208a4fbcb17b609d4b71c8ae",
+      "statement": "Every sys_* wrapper in multiput.c calls through a resolved function pointer in the syscall_api table via the CALLn macros rather than issuing a raw syscall instruction directly, satisfying retail PS4 firmware's syscall-origin requirement that syscalls originate from mapped libkernel code.",
+      "evidence": [
+        {
+          "resource": "repo://src/multiput.c#L98-L186",
+          "version": "repo-lines-v1:sha256:237ccf192927dd7ca50a62ea28300406f97bedf966b6b019e2a220d35fa8082c:eyJzZWxlY3RlZExpbmVDb3VudCI6ODksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyN2IxNjk2ZTJhZjhiODZjOTFlZWVkNjQ4OTI4ZDU1Yjk4ZDY5M2IwMTUyYzU4YjA5MmE1ZTQ5NGY5NDZkMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlOTMzYjRiZTI1ZWQzMjBkN2QxNWEwZWI2MGE4NzU4ZTJjMmNkOThmNTEwNjQ5YzlkNDc3OTMwNGNjOTJhYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlYzA3YTU2MWJkMjE4NjM1NmFiMTM3NGE2MGRhNDhkMjkwOWM2OTY3N2U2NjZjMDk2MzRlYjI2MjQwZjJiYmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f740731687e646df99533ab44c5058f9",
+      "statement": "serve() runs a single poll(2) loop in one process with MAX_CONNS=64 connection slots and no threads; conn_step() drives each connection through explicit states ST_HEADER, ST_PATHLEN, ST_PATH, and for DATA connections ST_LENGTH and ST_BODY, before ST_REPLY writes a single K or E byte and resets the slot.",
+      "evidence": [
+        {
+          "resource": "repo://src/multiput.c#L383-L473",
+          "version": "repo-lines-v1:sha256:7ffa923b0651ef8ad4de75791c50c9f764b6fb37cfbef83439155c786ae4fe4d:eyJzZWxlY3RlZExpbmVDb3VudCI6OTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjNGI0MWQ4YTVhZDA0ZmE3Y2QxN2VmMzUxNjU1MWY0ZGNiYjViYmVhMWFmNjcwZmU0NTliYjI3OWZhYjkxNzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5ZWJiNzY1ZDFkYjVkNGE3OWU0ODRlNTdkMTEwNjY3MjZhMjYzNDZkZWI5YTNjNDEzODBkMGFmODZjZjgzMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5NGRjMDYyZTFkZjQ3ZDVmOWQzZDU3YzM1Njc2MzYyOTkzZmJiODVjZjAxZmQwYzYwMWQ1MDE5OTEzMTg1MjcifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L521-L568",
+          "version": "repo-lines-v1:sha256:78717c19533237cf5d2313788c0018abe576b975752eea0d009c2b38faf0c4c2:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjNGI0MWQ4YTVhZDA0ZmE3Y2QxN2VmMzUxNjU1MWY0ZGNiYjViYmVhMWFmNjcwZmU0NTliYjI3OWZhYjkxNzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhYzNlYWJiNTJlZmFkNzA3MDdhYWIzNTNkNGQ5YTAyYWRkZWNjNTI5ZGQ5ZjUxZTY3OWI4Y2ZmOTdlYmNhYzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiYWUwYzU1M2FjNTA4ZWFmMGRhMTgzZDFiMDY1NDNjNjJhNzNlMjI5MTEwYWQzMDNlYjVlYjJmMGEzYWVmNDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9acec8dfde92414ab2ffd6f8a7549399",
+      "statement": "conn_finish_setup() ftruncates the destination to the SETUP header's arg (total file size) before any DATA connection writes; each DATA connection's write_range() calls pwrite at its own c->arg plus bytes already written by that same connection, requiring no shared state between concurrent DATA connections.",
+      "evidence": [
+        {
+          "resource": "repo://src/multiput.c#L338-L353",
+          "version": "repo-lines-v1:sha256:9e2dd9ae49dd1ce2c03f773b1a4cc14c9a11a5643a96912fa83e762233de25e5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjNGI0MWQ4YTVhZDA0ZmE3Y2QxN2VmMzUxNjU1MWY0ZGNiYjViYmVhMWFmNjcwZmU0NTliYjI3OWZhYjkxNzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllZjY5YTNmYzg4YzcwYzAyZjY0Y2QzOTc4ZjE1MGZkZjdkMWY0ZTc1YzZhYTMxZjNjZWZmNTEwNWE2ODc2M2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0ODZlMzRlMTc3MGE5ODAyY2QzNDk5MDZhYTc5NzVhODY1NTMyZWRkMTY2ZWNmMWFjZmIxMzU5NzFjOWMxODkifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L366-L381",
+          "version": "repo-lines-v1:sha256:604aac233659e80e9018c25f5d5d3a1fd6e7c81b74d6783e8597816dc38dcf29:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxN2NjZTY1ZmY3ZmExYmVkMmFkZWRmMWJiMThkYmZhZGZlNjE2ZWQ2YTU3OTIwZTMwNTkwNGJiMWQyMWY2MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiNzMwNTcxNTk5ZTQ0MTYwY2VkMDVlNmE1ODU3MWExOTY5NDdlNmY0YjZkZDZiZjdkODUxMTk3OTc1NWUxMmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0OWJiNzJhZTI4NDY0Y2MxMjU0YmE4MzYxZjQwZTFhZDg4MWIwNzY2ZGYwZjNmMjQzNTQzYjc3ZmQ1MTkyYTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_84c0e66c64b9498da3cabdc50bf167be",
+      "statement": "path_is_allowed() requires a literal /data/pkg/ prefix, rejects a trailing slash, and rejects any path segment that is empty, '.', or '..', with an inline NUL check, so no path containing a '..' segment can pass regardless of position.",
+      "evidence": [
+        {
+          "resource": "repo://src/multiput.c#L265-L296",
+          "version": "repo-lines-v1:sha256:e407c99732474a6ceaedf941de9e6bc7614efdf4afa571bc57007442812b60e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxN2NjZTY1ZmY3ZmExYmVkMmFkZWRmMWJiMThkYmZhZGZlNjE2ZWQ2YTU3OTIwZTMwNTkwNGJiMWQyMWY2MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM5NTk4MjBiNjkyMmQ5NzQ5NTJhM2U5N2FmMTkyYjYxODVmYTFkNjFlZmU0OTZjMjE0ZDNiMmRjNmMzYWFlNGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4YWM4OTVlMWVjMzg4MWJiY2Y5ODNlNTk5ZDU0NWE5NWYwODJlZjJmNzM0MWU0YWE4YmJmYzY1YmY4NTVkYzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fe88826d23c041fa830e80fdddeca196",
+      "statement": "A 2026-09-27 live retest that appeared to show path_is_allowed() accepting a /data/pkg/../x traversal was root-caused to a stale receiver process from an earlier session still resident on the tested port (GoldHEN does not stop a previously launched payload, and a new payload's bind() on an already-open port fails silently); testing against a freshly built, never-before-used DEFAULT_PORT confirmed the check correctly rejects traversal and absolute-path attempts.",
+      "evidence": [
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:9d42becd17f2ad09d58e29112fc2c33d3c93964084ffa9f436459ae119a0936a"
+        },
+        {
+          "resource": "repo://src/multiput.c#L265-L296",
+          "version": "repo-lines-v1:sha256:e407c99732474a6ceaedf941de9e6bc7614efdf4afa571bc57007442812b60e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxN2NjZTY1ZmY3ZmExYmVkMmFkZWRmMWJiMThkYmZhZGZlNjE2ZWQ2YTU3OTIwZTMwNTkwNGJiMWQyMWY2MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM5NTk4MjBiNjkyMmQ5NzQ5NTJhM2U5N2FmMTkyYjYxODVmYTFkNjFlZmU0OTZjMjE0ZDNiMmRjNmMzYWFlNGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4YWM4OTVlMWVjMzg4MWJiY2Y5ODNlNTk5ZDU0NWE5NWYwODJlZjJmNzM0MWU0YWE4YmJmYzY1YmY4NTVkYzIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T19:28:00.481Z"
+  }
+}

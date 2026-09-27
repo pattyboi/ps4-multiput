@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:183d9ba0ca11c76cca93ace7665783a47bc43062f7764e12fd5a5a64ed64863e",
+  "claims": [
+    {
+      "id": "claim_be4f61f0f773463b9f353fa0950eae84",
+      "statement": "Every connection begins with a 16-byte header (uint8 kind, 7 zero pad bytes, little-endian uint64 arg) followed by a little-endian uint16 path length and the path bytes; DATA connections additionally send a little-endian uint64 body length followed by that many body bytes; every connection ends with a single reply byte 'K' or 'E'.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_protocol.py#L8-L20",
+          "version": "repo-lines-v1:sha256:88bc153da0b7ca3a029136c7438f10f7d4f918ff583026de25b0df50ceee6d4a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4YmYwYWY5N2Y0MTAxOGM4MzkyMDQxYTkwOGRmM2RhZDNhNGMwMWVlNmRiZTJjZjhhNTRhZmRhMWVmMjZlODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyMzkzNTJmOTVlNzNkZTBlMzNjMTUxM2NjZGQ1NTViODRkZmI4M2U4MjgwN2U1NjUzNjNlNDg1M2U5Y2E4OWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0YzZhMzJkMWUzN2Q2MTZhN2M3MmJiMjEzZTIyYTRkOTJkYTBiZTJhZDQ2YjcyNGQyOWU3ZWI2MDEyNTcxMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhYmRhMTE5Y2Y0NzU2ZjYzYjkwMjEyOTM2ZDI1N2UyNjhmMTE4YzNmOGIzNTIyNWQxMWQwZGI1NzEzM2YxZjgifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L14-L18",
+          "version": "repo-lines-v1:sha256:ed211db854fc4d0457e4327ea2a6f4c46e4fcaa7e2c2246ce697808a1cef2707:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTVkMzliYTc2MzU4MjA1MzM2ZTk1ZjlmNTExZGVkOTZiZjYxNzBhOTUxOGE4NGI0OWViYmY3NGQyMWMxYmJkOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWE1ZDUyMGVjZjNjM2RmZTRmMzc1OThjMTNhYjk0ZGRhNjM1OWQzM2E4NWQzNTI0NjQ2YmI0NGI2YjYwYWM2MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjY5ZTgzZDY4OWYwYzI3ZjVlOTBlM2U4ZjBlZmQ2YzhjN2E4YzI2MzkxZGYyNzZiYmY2NDc4YjA4NjlmMDFjNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_69eb342ce0564bf0a96218394bcc2489",
+      "statement": "For a SETUP connection (kind=0) the header's arg field is the total destination file size, applied server-side via ftruncate before any DATA connection writes; for a DATA connection (kind=1) arg is the byte offset that connection's range starts at, used as the base pwrite offset.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_protocol.py#L8-L9",
+          "version": "repo-lines-v1:sha256:8f9fc7821a1a8a55a9c6d4ad98259be613dedd1c645b5aaa0064d759b234305b:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzhiZjBhZjk3ZjQxMDE4YzgzOTIwNDFhOTA4ZGYzZGFkM2E0YzAxZWU2ZGJlMmNmOGE1NGFmZGExZWYyNmU4MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTQwM2E3ZWRhNWM3YzkyNDlkZjJkMWVhOWQ1ZjQ4MjRkNzI4OTQwY2RmYTU4N2Y0MWJmZWMyOGZhMmRlOGI5ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTRjNmEzMmQxZTM3ZDYxNmE3YzcyYmIyMTNlMjJhNGQ5MmRhMGJlMmFkNDZiNzI0ZDI5ZTdlYjYwMTI1NzEyNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzIwMzk0MTJmNDI2MjgzYzM2ZDRiY2RiYzJjNDA2OTBjOTFlY2RlMjM5YWY0MWZlMGNiOWFjNDAxYzY1NjVmNSJ9"
+        },
+        {
+          "resource": "repo://src/multiput.c#L338-L353",
+          "version": "repo-lines-v1:sha256:9e2dd9ae49dd1ce2c03f773b1a4cc14c9a11a5643a96912fa83e762233de25e5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjNGI0MWQ4YTVhZDA0ZmE3Y2QxN2VmMzUxNjU1MWY0ZGNiYjViYmVhMWFmNjcwZmU0NTliYjI3OWZhYjkxNzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllZjY5YTNmYzg4YzcwYzAyZjY0Y2QzOTc4ZjE1MGZkZjdkMWY0ZTc1YzZhYTMxZjNjZWZmNTEwNWE2ODc2M2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0ODZlMzRlMTc3MGE5ODAyY2QzNDk5MDZhYTc5NzVhODY1NTMyZWRkMTY2ZWNmMWFjZmIxMzU5NzFjOWMxODkifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L366-L381",
+          "version": "repo-lines-v1:sha256:604aac233659e80e9018c25f5d5d3a1fd6e7c81b74d6783e8597816dc38dcf29:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxN2NjZTY1ZmY3ZmExYmVkMmFkZWRmMWJiMThkYmZhZGZlNjE2ZWQ2YTU3OTIwZTMwNTkwNGJiMWQyMWY2MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiNzMwNTcxNTk5ZTQ0MTYwY2VkMDVlNmE1ODU3MWExOTY5NDdlNmY0YjZkZDZiZjdkODUxMTk3OTc1NWUxMmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0OWJiNzJhZTI4NDY0Y2MxMjU0YmE4MzYxZjQwZTFhZDg4MWIwNzY2ZGYwZjNmMjQzNTQzYjc3ZmQ1MTkyYTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2d365783f7f3417b80c6cf2b22cc8cbf",
+      "statement": "The destination path rule is enforced independently on both ends with equivalent effect: multiput_protocol.py requires the path to start with /data/pkg/, equal its own posixpath.normpath(), not end in '/', contain no NUL, and be at most 4096 UTF-8 bytes; multiput.c's path_is_allowed() requires the literal /data/pkg/ prefix, rejects a trailing slash, rejects any '.' or '..' path segment, rejects an embedded NUL, and caps length at MAX_PATH_LEN=4096.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_protocol.py#L23-L34",
+          "version": "repo-lines-v1:sha256:3e1180a69195674eff9d7df3f82247af0b7eea774f8dc11d0b3ead5b7caa7a51:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZDdhMTllNmEwYjliNWI0N2YyMGUzOTBlYmQ3YTU4OGVkYzk4OTg3OGFjMzFkYjczYzc3MDVmMGI3MmU0ZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NDJjNGUxMDRhMmYxZGQ0YmI4MmE1Nzk5NTRlMTIwYjFjOTEzY2IzOTljMDE4OTljZjhhMzVhN2UyNmQ2ZjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkYjMxZjUxZjc2ODhlNGVlYWI5ZDJhM2QzNTY1YmFiOTU0MjY0MjM1M2Q4MTkyZTk5MjIxNzgxN2JkMGE0ZjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwOWMxZDkyNjI3NGQzZmNiMzQwZTg1ZWEzMjVlNTQ2MWU1ZThjMmViNDJiMmJmNDQ3NzMyNWNjMzFhZWU2MzEifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L265-L296",
+          "version": "repo-lines-v1:sha256:e407c99732474a6ceaedf941de9e6bc7614efdf4afa571bc57007442812b60e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxN2NjZTY1ZmY3ZmExYmVkMmFkZWRmMWJiMThkYmZhZGZlNjE2ZWQ2YTU3OTIwZTMwNTkwNGJiMWQyMWY2MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM5NTk4MjBiNjkyMmQ5NzQ5NTJhM2U5N2FmMTkyYjYxODVmYTFkNjFlZmU0OTZjMjE0ZDNiMmRjNmMzYWFlNGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4YWM4OTVlMWVjMzg4MWJiY2Y5ODNlNTk5ZDU0NWE5NWYwODJlZjJmNzM0MWU0YWE4YmJmYzY1YmY4NTVkYzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eaf13c39c5304351bf06c662041ea5a7",
+      "statement": "The wire protocol has no authentication, session token, or encryption; the /data/pkg/ restriction only bounds where a connected peer may write, not whether a peer may connect.",
+      "evidence": [
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:9d42becd17f2ad09d58e29112fc2c33d3c93964084ffa9f436459ae119a0936a"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T19:28:00.481Z"
+  }
+}

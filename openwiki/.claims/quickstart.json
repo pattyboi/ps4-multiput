@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:d111566a76089086c46a74dd9124f3ab9cbac865eed9e484a8357c0f6297d5ca",
+  "claims": [
+    {
+      "id": "claim_843868922fe042adb496e9ca89168aa5",
+      "statement": "The documented minimal transfer workflow is `python3 multiput_inject.py <console-ip>` followed by `python3 multiput_push.py <console-ip> <local-file> /data/pkg/<name> --streams 4`, requiring only Python 3.10+ on the host and a GoldHEN-jailbroken console with PayLoader enabled.",
+      "evidence": [
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:9d42becd17f2ad09d58e29112fc2c33d3c93964084ffa9f436459ae119a0936a"
+        }
+      ]
+    },
+    {
+      "id": "claim_b30b0e0b92744aa9becb93d280df3fe1",
+      "statement": "Rebuilding from source additionally requires the ps4-payload-dev/sdk toolchain via PS4_PAYLOAD_SDK and POSIX make; `make check` builds multiput.elf and runs both --selftest entry points fully offline as the standard pre-console gate.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L18-L31",
+          "version": "repo-lines-v1:sha256:65c732f2159f1b0f920635a14eaffbb9450c7aef9fefea385795e1864bab095c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhNjNjYzMxZjc2ZTMwMjYzYmY0ODEyY2M5ZDQyZTIwN2Q1YzM2NjYyODZiMzBmYjdkY2FiYTdlMTdmZGMyMWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzMDA1ZDVhMmI1ZWQ4OTU2YmVmZGFlZWRhOGUxZGRhZTVmOTJmNTEyYWU2Nzg2ZGMxMDUxNjkwNTY0NzhiN2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlMTA2MmU3YjNhNzQ5ZjM3Y2QwYzE4MGNjMzIxMGM5ZDEyYzJkMzM4NmQ1ZDlhOGMwYTAxNTAyYjlhYzI3NDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiYmVmOTAyOWYwZmJlODZlYWEyYmExYzIzOTVmODVkYzcwNGMyNDdmYjVjMTIwODJlNDFmNjczYWVkYTM5MGEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T19:28:00.481Z"
+  }
+}

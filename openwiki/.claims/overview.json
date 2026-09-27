@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:885d4623ffd79ec062d985fcb28bcb96ed5b656ffa09238de65588c617954fba",
+  "claims": [
+    {
+      "id": "claim_0b5c12d4631a47d096a26d5dcee02230",
+      "statement": "MultiPut's three actors are GoldHEN PayLoader (unauthenticated HTTP, default port 9090) which executes the uploaded ELF, the freestanding receiver multiput.elf listening on port 9022, and the Python sender multiput_push.py which opens one SETUP connection followed by 1-64 parallel DATA connections.",
+      "evidence": [
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:9d42becd17f2ad09d58e29112fc2c33d3c93964084ffa9f436459ae119a0936a"
+        },
+        {
+          "resource": "repo://multiput_inject.py",
+          "version": "repo-file-v1:sha256:3e1c6a24bac787abebe52219bcc56f75dd16b584864e3c57a6a9f8aefbbbaa09"
+        },
+        {
+          "resource": "repo://multiput_push.py",
+          "version": "repo-file-v1:sha256:57c94da8142cc2414ae6932dbd68f603a92126c82bb24e16967bc05b201a3c84"
+        }
+      ]
+    },
+    {
+      "id": "claim_91b05b7104b34d84925436922d1398c3",
+      "statement": "The receiver has no ps4debug dependency: it resolves its own libkernel syscall stub addresses at runtime via resolve_syscalls(), which scans backward from the return address captured at its own _start entry, instead of relying on a host-side ps4debug-based ELF patching step.",
+      "evidence": [
+        {
+          "resource": "repo://src/multiput.c#L138-L162",
+          "version": "repo-lines-v1:sha256:c0e699f9bfcc5be49b4f710b29a893912efc92344218384d0eb9e7134b7f9e31:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxN2NjZTY1ZmY3ZmExYmVkMmFkZWRmMWJiMThkYmZhZGZlNjE2ZWQ2YTU3OTIwZTMwNTkwNGJiMWQyMWY2MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4ZDVmYTU3YzlkMGJlYzFkOWEzODE2MTk5ODE5YWRhNGY0NWY2YTYwM2NjOWI1YTFjOGEyNmM5NTBkZWQ1OGYifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L573-L581",
+          "version": "repo-lines-v1:sha256:69c2b923b2dc3cc8d868a64fd0f56390254d1b3badf965bd12cb694522ad8e4d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FjNWVlY2ZkYzZmZDc4ZWI5MzM0MGI2YzNiMWQwOWYxZDMzNmE3NGI1YmZjYTZjZTRmZDAzYTc2NTEzZDNjMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTc2YjVkOTI3N2FmMGM1MTk0NzhmMjQ2ZGZiMDkxZmYyYTllMzMwNTE3YjYxYTllZTMxM2NlMDZjOWNkZTI0ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8cd22865b2ed401782453052c92fba31",
+      "statement": "The /data/pkg/ destination restriction is enforced independently on both sides: multiput_protocol.py's validate_remote_path() on the client before any network send, and multiput.c's path_is_allowed() on the console before any file is opened or resized.",
+      "evidence": [
+        {
+          "resource": "repo://multiput_protocol.py#L23-L34",
+          "version": "repo-lines-v1:sha256:3e1180a69195674eff9d7df3f82247af0b7eea774f8dc11d0b3ead5b7caa7a51:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZDdhMTllNmEwYjliNWI0N2YyMGUzOTBlYmQ3YTU4OGVkYzk4OTg3OGFjMzFkYjczYzc3MDVmMGI3MmU0ZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NDJjNGUxMDRhMmYxZGQ0YmI4MmE1Nzk5NTRlMTIwYjFjOTEzY2IzOTljMDE4OTljZjhhMzVhN2UyNmQ2ZjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkYjMxZjUxZjc2ODhlNGVlYWI5ZDJhM2QzNTY1YmFiOTU0MjY0MjM1M2Q4MTkyZTk5MjIxNzgxN2JkMGE0ZjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwOWMxZDkyNjI3NGQzZmNiMzQwZTg1ZWEzMjVlNTQ2MWU1ZThjMmViNDJiMmJmNDQ3NzMyNWNjMzFhZWU2MzEifQ"
+        },
+        {
+          "resource": "repo://src/multiput.c#L265-L296",
+          "version": "repo-lines-v1:sha256:e407c99732474a6ceaedf941de9e6bc7614efdf4afa571bc57007442812b60e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxN2NjZTY1ZmY3ZmExYmVkMmFkZWRmMWJiMThkYmZhZGZlNjE2ZWQ2YTU3OTIwZTMwNTkwNGJiMWQyMWY2MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM5NTk4MjBiNjkyMmQ5NzQ5NTJhM2U5N2FmMTkyYjYxODVmYTFkNjFlZmU0OTZjMjE0ZDNiMmRjNmMzYWFlNGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4YWM4OTVlMWVjMzg4MWJiY2Y5ODNlNTk5ZDU0NWE5NWYwODJlZjJmNzM0MWU0YWE4YmJmYzY1YmY4NTVkYzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bfa703ffc093452289a50e88fee47376",
+      "statement": "MultiPut's wire protocol has no authentication or encryption; the README documents it as trusted-LAN-only, since GoldHEN PayLoader is also an unauthenticated service.",
+      "evidence": [
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:9d42becd17f2ad09d58e29112fc2c33d3c93964084ffa9f436459ae119a0936a"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T19:28:00.481Z"
+  }
+}
