@@ -1,0 +1,16 @@
+[Unit]
+Description=MultiPut web UI (browse package library and push over TCP or reliable UDP)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dietpi
+WorkingDirectory=/mnt/dietpi_userdata/staging/ps4/multiput/web
+ExecStart=/mnt/dietpi_userdata/staging/ps4/multiput/web/.venv/bin/python3 app.py
+Environment=MULTIPUT_WEB_HTTP_PORT=8101
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

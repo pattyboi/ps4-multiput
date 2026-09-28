@@ -1,0 +1,223 @@
+/* PS4 MultiPut dashboard -- vintage lowrider theme.
+ * Aged cream, oxide red, black ink, tarnished chrome and one gold pinstripe.
+ * Serif wordmark, small caps, quiet rules. No neon, no flames. */
+
+:root {
+  color-scheme: light;
+  --bg: #efe6d3;          /* aged cream */
+  --card: #e8dcc4;        /* slightly deeper cream */
+  --card-edge: #d9c9a8;  /* worn saddle trim */
+  --ink: #241f1a;         /* black ink */
+  --text: #33302a;
+  --muted: #7a7263;      /* dusty taupe */
+  --oxide: #6e2224;      /* deep oxide red */
+  --oxide-dark: #571a1c;
+  --chrome: #b9b3a4;     /* tarnished chrome */
+  --chrome-bright: #d8d4c9;
+  --gold: #a98c4e;       /* gold pinstripe */
+  --danger: #8c2f26;
+  --ok: #4a5d3a;         /* patina green */
+  --field: #f4ecdc;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", "Palatino Linotype", serif;
+  background: var(--bg);
+  background-image: repeating-linear-gradient(
+    0deg, rgba(36, 31, 26, 0.012) 0 2px, transparent 2px 5px);
+  color: var(--text);
+}
+
+header {
+  padding: 1.1rem 1.5rem 0.9rem;
+  border-bottom: 3px double var(--ink);
+  position: relative;
+}
+header::after {           /* the one gold pinstripe under the double rule */
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -6px;
+  border-bottom: 1px solid var(--gold);
+}
+header h1 {
+  margin: 0 0 0.15rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--oxide);
+  font-variant: small-caps;
+}
+.tagline {
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.watch-dir {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  margin-top: 0.35rem;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--ink);
+  border-radius: 5px;
+  padding: 1rem 1.25rem;
+  box-shadow: inset 0 0 0 1px var(--card-edge);
+}
+.card h2 {
+  margin-top: 0;
+  font-size: 0.95rem;
+  color: var(--oxide);
+  font-variant: small-caps;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--chrome);
+  padding-bottom: 0.3rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+.select-all { margin-left: auto; }
+
+select, input[type="text"], input[type="number"] {
+  background: var(--field);
+  color: var(--ink);
+  border: 1px solid var(--chrome);
+  border-radius: 4px;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+select:focus, input:focus { outline: 1px solid var(--gold); }
+
+button {
+  background: var(--chrome-bright);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-top-color: var(--chrome-bright);
+  border-left-color: var(--chrome-bright);
+  border-radius: 4px;
+  padding: 0.4rem 0.95rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+}
+button:hover { background: var(--chrome); }
+button.primary {
+  background: var(--oxide);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(239, 230, 211, 0.28);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+button.primary:hover { background: var(--oxide-dark); }
+
+.add-root { margin-bottom: 0.75rem; }
+.add-root summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; }
+.add-root-form { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.add-root-form input[type="text"] { flex: 1; min-width: 12rem; }
+
+.hint { color: var(--muted); font-size: 0.9rem; }
+
+.group { margin-bottom: 0.75rem; }
+.group-header {
+  background: var(--field);
+  border-bottom: 2px solid var(--gold);
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.25rem;
+}
+.group-header label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.muted { color: var(--muted); font-size: 0.8rem; }
+
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem 0.6rem 0.3rem 1.6rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.file-row:hover { background: var(--field); }
+.file-name { flex: 1; font-size: 0.9rem; word-break: break-all; }
+.file-size { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+
+.progress-outer {
+  background: var(--field);
+  border: 1px solid var(--chrome);
+  border-radius: 4px;
+  height: 12px;
+  overflow: hidden;
+  margin: 0.6rem 0;
+}
+.progress-inner {
+  background: linear-gradient(180deg, var(--oxide) 0%, var(--oxide-dark) 100%);
+  box-shadow: inset 0 1px 0 rgba(239, 230, 211, 0.25);
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+#status-log {
+  background: #26211c;
+  color: #d8d0bf;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  padding: 0.6rem;
+  font-size: 0.78rem;
+  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  max-height: 14rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+}
+
+.state {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  border: 1px solid var(--ink);
+}
+.state-running { background: var(--chrome-bright); color: var(--ink); }
+.state-done { background: var(--ok); color: var(--bg); }
+.state-failed { background: var(--danger); color: var(--bg); }
+.state-idle { background: var(--chrome); color: var(--ink); }
+
+.error { color: var(--danger); margin-top: 0.4rem; }

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS4 MultiPut</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>PS4 MultiPut</h1>
+  <div class="tagline">parallel TCP push &middot; v1.2</div>
+  <div class="watch-dir" id="watch-dir"></div>
+</header>
+
+<main>
+  <section class="card">
+    <div class="toolbar">
+      <label>Console address(es)
+        <input type="text" id="host" placeholder="192.168.1.105[,192.168.1.199]" value="{{ default_host }}">
+      </label>
+      <label>Directory
+        <select id="root-select"></select>
+      </label>
+      <button id="refresh">Refresh</button>
+      <label class="select-all"><input type="checkbox" id="select-all"> Select all</label>
+      <label>Streams
+        <input type="number" id="streams" min="1" max="64" value="{{ default_streams }}" style="width:4rem">
+      </label>
+      <button id="push" class="primary">Push selected</button>
+    </div>
+    <details class="add-root">
+      <summary>Add a directory</summary>
+      <div class="add-root-form">
+        <input type="text" id="add-root-label" placeholder="label (e.g. decypharr)">
+        <input type="text" id="add-root-path" placeholder="/full/path under {{ download_base }}">
+        <button id="add-root-btn">Add</button>
+      </div>
+      <div class="hint" id="add-root-error"></div>
+    </details>
+    <div id="empty" class="hint" hidden></div>
+    <div id="listing"></div>
+  </section>
+
+  <section class="card" id="status-card" hidden>
+    <h2>Push status</h2>
+    <div id="status-summary"></div>
+    <div class="progress-outer"><div class="progress-inner" id="progress-bar"></div></div>
+    <pre id="status-log"></pre>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
