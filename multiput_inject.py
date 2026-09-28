@@ -10,7 +10,7 @@ import sys
 import threading
 import time
 
-VERSION = "0.1.0"
+VERSION = "1.2.0"
 
 DEFAULT_PAYLOADER_PORT = 9090
 DEFAULT_LISTENER_PORT = 9022

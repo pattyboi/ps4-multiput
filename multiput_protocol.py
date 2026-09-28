@@ -2,7 +2,6 @@
 """PS4 MultiPut wire framing shared by the sender and its loopback tests."""
 from __future__ import annotations
 
-import posixpath
 import struct
 
 KIND_SETUP = 0
@@ -22,23 +21,26 @@ assert HEADER_SIZE == 16
 
 def validate_remote_path(path: str) -> bytes:
     """Return UTF-8 bytes for a safe regular-file destination under /data/pkg."""
-    if not path.startswith(DESTINATION_ROOT):
-        raise ValueError(f"destination must be below {DESTINATION_ROOT}")
-    if path != posixpath.normpath(path) or path.endswith("/"):
-        raise ValueError("destination must be a normalized file path")
     raw = path.encode("utf-8")
-    if b"\0" in raw:
-        raise ValueError("destination contains a NUL byte")
     if len(raw) > MAX_PATH_LEN:
-        raise ValueError(f"destination exceeds {MAX_PATH_LEN} UTF-8 bytes")
+        raise ValueError(f"path longer than {MAX_PATH_LEN} UTF-8 bytes")
+    if b"\0" in raw:
+        raise ValueError("path contains a NUL byte")
+    if not path.startswith(DESTINATION_ROOT):
+        raise ValueError(f"destination must start with {DESTINATION_ROOT}")
+    import posixpath
+    if path != posixpath.normpath(path):
+        raise ValueError("destination must be its own normalized path")
+    if path.endswith("/"):
+        raise ValueError("destination must be a file, not a directory")
     return raw
 
 
 def pack_header(kind: int, arg: int) -> bytes:
     if kind not in (KIND_SETUP, KIND_DATA):
-        raise ValueError(f"unknown connection kind {kind}")
+        raise ValueError(f"unsupported frame kind: {kind}")
     if not 0 <= arg <= 0xFFFF_FFFF_FFFF_FFFF:
-        raise ValueError("header argument does not fit uint64")
+        raise ValueError("arg does not fit uint64")
     return struct.pack(HEADER_FMT, kind, b"\0" * 7, arg)
 
 
@@ -55,14 +57,14 @@ def pack_length(length: int) -> bytes:
 
 def recv_full(sock, length: int) -> bytes:
     """Read exactly length bytes or raise ConnectionError."""
-    chunks: list[bytes] = []
-    received = 0
-    while received < length:
-        chunk = sock.recv(min(length - received, 1024 * 1024))
+    chunks = []
+    remaining = length
+    while remaining > 0:
+        chunk = sock.recv(min(remaining, 1 << 20))
         if not chunk:
-            raise ConnectionError(f"peer closed after {received}/{length} bytes")
+            raise ConnectionError("connection closed mid-frame")
         chunks.append(chunk)
-        received += len(chunk)
+        remaining -= len(chunk)
     return b"".join(chunks)
 
 

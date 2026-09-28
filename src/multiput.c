@@ -8,14 +8,10 @@
  * libkernel syscall stubs, and calls through them to satisfy retail PS4
  * syscall-origin checks.
  *
- * One process multiplexes the listener and up to 64 DATA connections with
- * poll(2).  Each connection writes its disjoint range with pwrite(2), keeping
- * the adjacent multiput_protocol.py wire contract:
- *
- *   16-byte header: uint8 kind, 7 zero bytes, uint64 arg
- *   uint16 path length, path bytes
- *   DATA only: uint64 body length, body bytes
- *   reply: one byte, 'K' or 'E'
+ * One process multiplexes the listener and up to MAX_CONNS TCP connections
+ * with poll(2); every DATA connection pwrites its own disjoint byte range
+ * directly. The adjacent multiput_protocol.py defines the wire contract;
+ * replies remain one byte, 'K' or 'E'.
  */
 
 #ifndef DEFAULT_PORT
@@ -33,6 +29,13 @@
 #define SOL_SOCKET 0xffff
 #define SO_REUSEADDR 0x0004
 #define SO_NOSIGPIPE 0x0800
+#define SO_RCVBUF 0x1002
+
+/* Orbis defaults socket buffers to 8 KiB. Measured in-flight data over the
+ * Wi-Fi bridge capped at ~64 KiB, throttling every stream to window/RTT.
+ * Reserve enough receive buffer that a single stream can fill the link. */
+#define SOCKET_BUFSZ (512 * 1024)
+
 
 #define O_WRONLY 0x0001
 #define O_CREAT 0x0200
@@ -91,10 +94,12 @@ typedef struct {
   u8 reply_byte;
 } conn_t;
 
+
 static conn_t conns[MAX_CONNS];
 static u8 recv_buf[RECV_CHUNK];
 static pollfd_t pollfds[MAX_CONNS + 1];
 static int pollmap[MAX_CONNS + 1];
+
 typedef struct {
   u64 read_fn;
   u64 write_fn;
@@ -108,13 +113,20 @@ typedef struct {
   u64 poll_fn;
   u64 pwrite_fn;
   u64 ftruncate_fn;
+  u64 getsockopt_fn;
+  u64 klog_fn;
 } syscall_api_t;
 
 static volatile syscall_api_t syscall_api;
 
+/* Bitmask of syscall stubs found by the last resolve_syscalls() run; logged
+ * through klog so incomplete resolution is visible from the host. */
+static volatile u32 resolved_mask;
+
 #define LIBKERNEL_PAGE_SIZE 0x4000
 #define LIBKERNEL_SCAN_PAGES 32
 #define REQUIRED_SYSCALLS 0x0fff
+#define ALL_SYSCALLS 0xcfff
 
 static void
 record_syscall(u32 number, u64 address, u32 *found) {
@@ -131,6 +143,8 @@ record_syscall(u32 number, u64 address, u32 *found) {
     case 209: syscall_api.poll_fn = address; *found |= 1U << 9; break;
     case 476: syscall_api.pwrite_fn = address; *found |= 1U << 10; break;
     case 480: syscall_api.ftruncate_fn = address; *found |= 1U << 11; break;
+    case 118: syscall_api.getsockopt_fn = address; *found |= 1U << 14; break;
+    case 601: syscall_api.klog_fn = address; *found |= 1U << 15; break;
     default: break;
   }
 }
@@ -153,12 +167,14 @@ resolve_syscalls(u64 caller) {
                    ((u32)p[5] << 16) | ((u32)p[6] << 24);
       record_syscall(number, (u64)(usize)p, &found);
     }
-    if(found == REQUIRED_SYSCALLS) {
+    if(found == ALL_SYSCALLS) {
+      resolved_mask = found;
       return 0;
     }
     page = (const u8 *)((usize)page - LIBKERNEL_PAGE_SIZE);
   }
-  return -1;
+  resolved_mask = found;
+  return (found & REQUIRED_SYSCALLS) == REQUIRED_SYSCALLS ? 0 : -1;
 }
 
 #define CALL1(name, a1)                                                        \
@@ -174,6 +190,10 @@ resolve_syscalls(u64 caller) {
 #define CALL5(name, a1, a2, a3, a4, a5)                                        \
   (((long (*)(long, long, long, long, long))(usize)syscall_api.name)(          \
       (long)(a1), (long)(a2), (long)(a3), (long)(a4), (long)(a5)))
+#define CALL6(name, a1, a2, a3, a4, a5, a6)                                    \
+  (((long (*)(long, long, long, long, long, long))(usize)syscall_api.name)(     \
+      (long)(a1), (long)(a2), (long)(a3), (long)(a4), (long)(a5), (long)(a6)))
+
 
 static inline ssize
 sys_read(int fd, void *buf, usize length) {
@@ -194,6 +214,7 @@ static inline int
 sys_close(int fd) {
   return (int)CALL1(close_fn, fd);
 }
+
 
 static inline int
 sys_socket(int domain, int type, int protocol) {
@@ -235,6 +256,77 @@ sys_ftruncate(int fd, u64 length) {
   return (int)CALL2(ftruncate_fn, fd, length);
 }
 
+static inline int
+sys_getsockopt(int fd, int level, int option, void *value, u32 *length) {
+  return (int)CALL5(getsockopt_fn, fd, level, option, value, length);
+}
+
+/* --- klog: Orbis syscall 601, the same path libkernel's own <118>[label]
+ * lines take (visible on GoldHEN's klog server, TCP 3232). Optional: every
+ * call is skipped when the stub was not resolved. --- */
+
+static u32
+append_text(u8 *out, u32 pos, const char *text) {
+  while(*text) {
+    out[pos++] = (u8)*text++;
+  }
+  return pos;
+}
+
+static u32
+append_dec(u8 *out, u32 pos, long value) {
+  u8 tmp[20];
+  u32 len = 0;
+  unsigned long magnitude = value < 0
+      ? (unsigned long)(-(value + 1)) + 1UL
+      : (unsigned long)value;
+  if(value < 0) {
+    out[pos++] = '-';
+  }
+  do {
+    tmp[len++] = (u8)('0' + (magnitude % 10));
+    magnitude /= 10;
+  } while(magnitude);
+  while(len) {
+    out[pos++] = tmp[--len];
+  }
+  return pos;
+}
+
+static u32
+append_hex(u8 *out, u32 pos, u32 value) {
+  static const char digits[] = "0123456789abcdef";
+  for(int shift = 28; shift >= 0; shift -= 4) {
+    out[pos++] = (u8)digits[(value >> shift) & 0xf];
+  }
+  return pos;
+}
+
+static void
+klog_line(const u8 *text, u32 length) {
+  if(syscall_api.klog_fn) {
+    (void)CALL3(klog_fn, 7, text, 0);
+  }
+  (void)length;
+}
+
+static void
+klog_port_stubs(const char *tag) {
+  if(!syscall_api.klog_fn) {
+    return;
+  }
+  u8 line[96];
+  u32 mask = resolved_mask;
+  u32 pos = append_text(line, 0, "<118>[multiput] ");
+  pos = append_text(line, pos, tag);
+  pos = append_dec(line, pos, DEFAULT_PORT);
+  pos = append_text(line, pos, " stubs=0x");
+  pos = append_hex(line, pos, mask);
+  pos = append_text(line, pos, "\n");
+  line[pos] = 0;
+  klog_line(line, pos);
+}
+
 static void
 zero_bytes(void *ptr, usize length) {
   u8 *p = (u8 *)ptr;
@@ -248,6 +340,7 @@ load_u16(const u8 *p) {
   return (u16)p[0] | ((u16)p[1] << 8);
 }
 
+
 static u64
 load_u64(const u8 *p) {
   u64 value = 0;
@@ -256,6 +349,8 @@ load_u64(const u8 *p) {
   }
   return value;
 }
+
+
 
 static u16
 byte_swap_u16(u16 value) {
@@ -294,6 +389,7 @@ path_is_allowed(const char *path, u16 length) {
   }
   return 1;
 }
+
 
 static void
 conn_reset(conn_t *c) {
@@ -334,6 +430,7 @@ conn_fail(conn_t *c) {
   c->reply_byte = 'E';
   c->state = ST_REPLY;
 }
+
 
 static void
 conn_finish_setup(conn_t *c) {
@@ -464,13 +561,19 @@ conn_step(conn_t *c) {
     break;
   case ST_LENGTH:
     c->body_length = load_u64(c->field);
-    conn_open_data(c);
+    if(c->kind == KIND_DATA) {
+      conn_open_data(c);
+    } else {
+      conn_fail(c);
+    }
     break;
   default:
     conn_fail(c);
     break;
   }
 }
+
+
 
 static int
 open_listener(u16 port) {
@@ -511,6 +614,33 @@ accept_one(int listener) {
 
   int one = 1;
   sys_setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
+  /* Verify the reservation: Orbis can reject or clamp a large SO_RCVBUF
+   * (per-process budget pressure, sb_max), which would silently leave the
+   * connection on the tiny default window -- the exact shape of a
+   * high-stream-count regression. Requested vs actually-granted is logged
+   * through klog (TCP 3232) for every accepted connection. */
+  int requested = SOCKET_BUFSZ;
+  int set_result = sys_setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &requested,
+                                  sizeof(requested));
+  int granted = 0;
+  u32 granted_len = sizeof(granted);
+  if(syscall_api.getsockopt_fn) {
+    (void)sys_getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &granted, &granted_len);
+  }
+  if(syscall_api.klog_fn) {
+    u8 line[96];
+    u32 pos = append_text(line, 0, "<118>[multiput] conn=");
+    pos = append_dec(line, pos, (long)(c - conns));
+    pos = append_text(line, pos, " fd=");
+    pos = append_dec(line, pos, fd);
+    pos = append_text(line, pos, " set=");
+    pos = append_dec(line, pos, set_result);
+    pos = append_text(line, pos, " granted=");
+    pos = append_dec(line, pos, granted);
+    pos = append_text(line, pos, "\n");
+    line[pos] = 0;
+    klog_line(line, pos);
+  }
   zero_bytes(c, sizeof(*c));
   c->fd = fd;
   c->filefd = -1;
@@ -528,8 +658,13 @@ serve(void) {
 
   int listener = open_listener(DEFAULT_PORT);
   if(listener < 0) {
+    /* A failed bind (stale receiver already on this port) used to be a
+     * silent exit; it is now visible in klog. */
+    klog_port_stubs("bind failed port=");
     return;
   }
+  klog_port_stubs("up port=");
+
   for(;;) {
     int count = 1;
     pollfds[0].fd = listener;
@@ -574,6 +709,7 @@ void *
 _start(void *unused) {
   (void)unused;
   if(resolve_syscalls((u64)(usize)__builtin_return_address(0)) < 0) {
+    klog_port_stubs("resolve incomplete port=");
     return (void *)0;
   }
   serve();

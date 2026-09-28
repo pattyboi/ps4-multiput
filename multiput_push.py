@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Send one file to a running PS4 MultiPut receiver over parallel TCP ranges.
+"""Send one file to a running PS4 MultiPut receiver.
+
+One SETUP connection pre-sizes the destination, then N disjoint byte ranges
+stream over N parallel TCP connections, each acknowledged independently.
 
 The receiver must already be running; launch it with multiput_inject.py.
 Destinations are restricted to normalized files below /data/pkg/.
@@ -7,43 +10,62 @@ Destinations are restricted to normalized files below /data/pkg/.
 Examples:
     python3 multiput_push.py 192.168.1.50 game.pkg /data/pkg/game.pkg
     python3 multiput_push.py 192.168.1.50 game.pkg /data/pkg/game.pkg --streams 8
+    python3 multiput_push.py 192.168.1.50,192.168.1.51 game.pkg /data/pkg/game.pkg
     python3 multiput_push.py --selftest
 """
 from __future__ import annotations
 
+from collections.abc import Sequence
 import argparse
 import os
 import socket
+import struct
 import sys
 import threading
 import time
 
 import multiput_protocol as proto
-VERSION = "0.1.0"
+VERSION = "1.2.0"
 
 
 DEFAULT_STREAMS = 4
 CHUNK_SIZE = 1 * 1024 * 1024
+SOCKET_SNDBUF = 512 * 1024
 
 
 def _print_event(kind: str, **kw) -> None:
     if kind == "setup":
-        print(f"setup {kw['remote']} ({kw['total']:,} bytes, {kw['streams']} streams)")
+        print(f"setup {kw['remote']} ({kw['total']:,} bytes, "
+              f"{kw['streams']} streams)")
     elif kind == "progress":
         pct = kw["sent"] / kw["total"] * 100 if kw["total"] else 0
         print(f"  {kw['sent']:,}/{kw['total']:,} ({pct:.1f}%) at {kw['rate_mb_s']:.1f} MB/s")
     elif kind == "stream_done":
         print(f"  stream {kw['index']} done ({kw['length']:,} bytes @ +{kw['offset']:,})")
     elif kind == "stream_failed":
-        print(f"  stream {kw['index']} FAILED: {kw['error']}")
+        label = (
+            f"stream {kw['index']}" if kw["index"] >= 0 else "transfer"
+        )
+        print(f"  {label} FAILED: {kw['error']}")
     elif kind == "done":
         print(f"done  {kw['remote']} ({kw['sent']:,} bytes, {kw['elapsed_s']:.1f}s, "
               f"{kw['avg_mb_s']:.1f} MB/s avg)")
 
 
+def _connect(host: str, port: int, timeout: float) -> socket.socket:
+    """Connected stream socket with a large send buffer.
+
+    The receiver's stock 8 KiB socket buffer throttles each stream to
+    window/RTT (~64 KiB in flight measured); a large reservation lets a
+    single stream fill the link."""
+    sock = socket.create_connection((host, port), timeout=timeout)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, SOCKET_SNDBUF)
+    return sock
+
+
 def send_setup(host: str, port: int, remote_path: str, file_size: int,
                timeout: float = 30.0) -> bool:
-    with socket.create_connection((host, port), timeout=timeout) as sock:
+    with _connect(host, port, timeout) as sock:
         sock.sendall(proto.pack_header(proto.KIND_SETUP, file_size))
         sock.sendall(proto.pack_path(remote_path))
         return proto.recv_ack(sock)
@@ -55,7 +77,7 @@ def _send_range(host: str, port: int, remote_path: str, local_path: str,
     over one fresh connection. progress_cb(n) is called after each chunk
     actually sent (for aggregate rate reporting), not before -- a stalled
     connection must not be counted as progress."""
-    with socket.create_connection((host, port), timeout=timeout) as sock:
+    with _connect(host, port, timeout) as sock:
         sock.sendall(proto.pack_header(proto.KIND_DATA, offset))
         sock.sendall(proto.pack_path(remote_path))
         sock.sendall(proto.pack_length(length))
@@ -76,11 +98,19 @@ def _send_range(host: str, port: int, remote_path: str, local_path: str,
 
 
 def push_multistream(
-    host: str, port: int, local_path: str, remote_path: str,
+    host: str | Sequence[str], port: int, local_path: str, remote_path: str,
     streams: int = DEFAULT_STREAMS, on_event=_print_event, timeout: float = 60.0,
 ) -> bool:
-    """Return True only when every disjoint range is acknowledged."""
+    """Return True only when every disjoint range is acknowledged.
+
+    host is one address or a sequence of them: SETUP goes to the first
+    address and each DATA stream round-robins across all of them, so a
+    console reachable over several interfaces (wired + WiFi) is driven on
+    every interface at once."""
     proto.validate_remote_path(remote_path)
+    hosts = [host] if isinstance(host, str) else list(host)
+    if not hosts or any(not h for h in hosts):
+        raise ValueError("at least one non-empty host is required")
     if not 1 <= streams <= 64:
         raise ValueError("streams must be between 1 and 64")
     total = os.path.getsize(local_path)
@@ -89,7 +119,7 @@ def push_multistream(
 
     on_event("setup", remote=remote_path, total=total, streams=streams)
     try:
-        setup_ok = send_setup(host, port, remote_path, total, timeout=timeout)
+        setup_ok = send_setup(hosts[0], port, remote_path, total, timeout=timeout)
         setup_error = "SETUP rejected by receiver"
     except OSError as exc:
         setup_ok = False
@@ -123,8 +153,8 @@ def push_multistream(
 
     def worker(index: int, offset: int, length: int) -> None:
         try:
-            _send_range(host, port, remote_path, local_path, offset, length,
-                        progress_cb, timeout)
+            _send_range(hosts[index % len(hosts)], port, remote_path,
+                        local_path, offset, length, progress_cb, timeout)
             on_event("stream_done", index=index, offset=offset, length=length)
         except Exception as exc:  # noqa: BLE001 -- surfaced via errors list
             with lock:
@@ -150,16 +180,17 @@ def push_multistream(
 
 
 class _TestServer:
-    """Loopback implementation of the exact wire protocol using real files."""
+    """Loopback implementation of the wire protocol using real files."""
 
-    def __init__(self, root: str):
+    def __init__(self, root: str, host: str = "127.0.0.1", port: int = 0):
         self.root = root
+        self.handled = 0
+        self._stop = False
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self._sock.bind(("127.0.0.1", 0))
+        self._sock.bind((host, port))
         self._sock.listen(64)
         self.port = self._sock.getsockname()[1]
-        self._stop = False
         self._thread = threading.Thread(target=self._accept_loop, daemon=True)
         self._thread.start()
 
@@ -168,6 +199,7 @@ class _TestServer:
         while not self._stop:
             try:
                 conn, _ = self._sock.accept()
+                self.handled += 1
             except socket.timeout:
                 continue
             except OSError:
@@ -182,9 +214,9 @@ class _TestServer:
         with conn:
             try:
                 hdr = proto.recv_full(conn, proto.HEADER_SIZE)
-                kind, _pad, arg = __import__("struct").unpack(proto.HEADER_FMT, hdr)
+                kind, _pad, arg = struct.unpack(proto.HEADER_FMT, hdr)
                 path_len_raw = proto.recv_full(conn, 2)
-                path_len = __import__("struct").unpack(proto.PATH_LEN_FMT, path_len_raw)[0]
+                path_len = struct.unpack(proto.PATH_LEN_FMT, path_len_raw)[0]
                 path = proto.recv_full(conn, path_len).decode("utf-8")
                 local = self._resolve(path)
 
@@ -196,12 +228,14 @@ class _TestServer:
                     conn.sendall(b"K")
                 elif kind == proto.KIND_DATA:
                     length_raw = proto.recv_full(conn, 8)
-                    length = __import__("struct").unpack(proto.LENGTH_FMT, length_raw)[0]
+                    length = struct.unpack(proto.LENGTH_FMT, length_raw)[0]
                     fd = os.open(local, os.O_WRONLY)
                     remaining = length
                     written_offset = arg
                     while remaining > 0:
-                        chunk = proto.recv_full(conn, min(remaining, 1024 * 1024))
+                        chunk = proto.recv_full(
+                            conn, min(remaining, 1024 * 1024),
+                        )
                         os.pwrite(fd, chunk, written_offset)
                         written_offset += len(chunk)
                         remaining -= len(chunk)
@@ -258,6 +292,16 @@ def selftest() -> int:
             checks.append(("done event fired with full byte count",
                            any(k == "done" and kw.get("sent") == size for k, kw in events)))
 
+            empty_local = os.path.join(tmp, "empty.bin")
+            open(empty_local, "wb").close()
+            empty_ok = push_multistream(
+                "127.0.0.1", srv.port, empty_local, "/data/pkg/empty.pkg",
+                on_event=lambda _kind, **_kw: None,
+            )
+            empty_received = os.path.join(srv.root, "data/pkg/empty.pkg")
+            checks.append(("empty file handled",
+                           empty_ok and os.path.getsize(empty_received) == 0))
+
             invalid_paths = ("/etc/passwd", "/data/pkg/../escape.pkg",
                              "/data/pkg/", "/data/pkg//double.pkg")
             rejected = True
@@ -268,6 +312,24 @@ def selftest() -> int:
                 except ValueError:
                     pass
             checks.append(("unsafe destination paths rejected", rejected))
+
+            # multi-host: two loopback interfaces, one shared port, one root
+            srv_b = _TestServer(os.path.join(tmp, "console_root"), "127.0.0.2",
+                                port=srv.port)
+            try:
+                events_b: list[tuple[str, dict]] = []
+                ok_b = push_multistream(
+                    ["127.0.0.1", "127.0.0.2"], srv.port, local,
+                    "/data/pkg/multi.pkg", streams=4,
+                    on_event=lambda kind, **kw: events_b.append((kind, kw)),
+                )
+                received_b = os.path.join(srv.root, "data/pkg/multi.pkg")
+                checks.append(("multi-host push reports success", ok_b))
+                checks.append(("multi-host bytes byte-exact",
+                               ok_b and digest(received_b) == digest(local)))
+                checks.append(("second host served streams", srv_b.handled >= 1))
+            finally:
+                srv_b.close()
         finally:
             srv.close()
 
@@ -277,21 +339,23 @@ def selftest() -> int:
     if bad:
         print(f"SELFTEST FAIL  {len(bad)} of {len(checks)} failed: {', '.join(bad)}")
         return 1
-    print(f"SELFTEST PASS  {len(checks)} checks: multi-stream split, byte-exact "
-          "receive, uneven remainder, destination policy")
+    print(f"SELFTEST PASS  {len(checks)} checks: TCP multi-stream, byte-exact "
+          "receive, uneven remainder, empty file, destination policy")
     return 0
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0],
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("host", nargs="?")
+    ap.add_argument("host", nargs="?",
+                    help="console address, or comma-separated addresses "
+                         "(streams are spread across all of them)")
     ap.add_argument("local_path", nargs="?")
     ap.add_argument("remote_path", nargs="?")
     ap.add_argument("-p", "--port", type=int, default=proto.DEFAULT_PORT)
     ap.add_argument("--streams", type=int, default=DEFAULT_STREAMS)
     ap.add_argument("--timeout", type=float, default=60.0,
-                    help="per-socket timeout in seconds (default: 60)")
+                    help="socket/no-progress timeout in seconds (default: 60)")
     ap.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
@@ -303,8 +367,11 @@ def main() -> int:
         ap.error("host, local_path, remote_path are required unless --selftest")
 
     try:
-        ok = push_multistream(args.host, args.port, args.local_path, args.remote_path,
-                              streams=args.streams, timeout=args.timeout)
+        hosts = [h for h in (part.strip() for part in args.host.split(",")) if h]
+        ok = push_multistream(
+            hosts, args.port, args.local_path, args.remote_path,
+            streams=args.streams, timeout=args.timeout,
+        )
     except (OSError, ValueError) as exc:
         print(f"multiput push failed: {exc}", file=sys.stderr)
         return 1
