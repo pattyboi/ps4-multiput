@@ -1,5 +1,5 @@
 [Unit]
-Description=MultiPut web UI (browse package library and push over TCP or reliable UDP)
+Description=MultiPut web UI (browse .pkg library, multi-select, push over parallel streams)
 After=network-online.target
 Wants=network-online.target
 
